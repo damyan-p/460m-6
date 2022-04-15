@@ -41,12 +41,12 @@ always @(posedge clk)begin
     end
     else if (E1 < E2)begin
      sbuf <= S2;
-     F1 <= F1 >> (E2 - E1);
+     F1[11:0] <= F1[11:0] >> (E2 - E1);
      ebuf <= E1 + (E2 - E1);
      end
     else if(E1 > E2)begin
     sbuf <= S1;
-     F2 <= F2 >> (E1 - E2);
+     F2[11:0] <= F2[11:0] >> (E1 - E2);
      ebuf <= E2 + (E1 - E2);
     end
        next_state = 2;
@@ -54,17 +54,12 @@ always @(posedge clk)begin
     2:begin//adding fractions
     //this state is fine
     fracsum = F1 + F2;
-    if(fracsum == 0)begin
-    res <= {sbuf, ebuf, fracsum};
-    done <= 1;
-    next_state <= 0;
-    end
-    else   next_state = 4;//fractions do not sum to 0
+    next_state = 4;//fractions do not sum to 0
    end
   
     4:begin//checking for overflow
     //this state is fine
-    ovf = (~fracsum[12]&F1[12]&F2[12])|(fracsum[12]&(~F1[12])&(~F2[12]));
+    ovf = (~fracsum[12]&&F1[12]&&F2[12])||(fracsum[12]&&(~F1[12])&&(~F2[12]));
     if(ovf)begin
     fracsum <= fracsum >> 1;
     ebuf <= ebuf + 1;
