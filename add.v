@@ -6,10 +6,10 @@ output reg[7:0] res = 0
     );
 reg [2:0] state,next_state;  
 reg done = 0;//flag to determine if math finished
-reg [3:0] F1,F2; 
+reg [12:0] F1,F2; 
 reg [2:0] E1,E2;
-reg [1:0] S1,S2;
-reg [3:0] fracsum;
+reg S1,S2;
+reg [12:0] fracsum;
 reg [2:0] ebuf;
 reg sbuf = 0;
 reg ovf;
@@ -17,13 +17,15 @@ reg ovf;
 initial begin
 state = 0;
 next_state = 0;
+F1 <= 0;
+F2 <= 0;
 end
 always @(posedge clk)begin
     case(state)
     0:begin//getting sign,exp,frac from each op
     //state 0 works as it should
-    F1 <= op1[3:0];
-    F2 <= op2[3:0];
+    F1[12:7] = {op1[7],1'b1,op1[3:0]};
+    F2[12:7] = {op2[7],1'b1,op2[3:0]};
     E1 <= op1[6:4];
     E2 <= op2[6:4];
     S1 <= op1[7];
@@ -62,23 +64,23 @@ always @(posedge clk)begin
   
     4:begin//checking for overflow
     //this state is fine
-    ovf = (~fracsum[3]&F1[3]&F2[3])|(fracsum[3]&(~F1[3])&(~F2[3]));
+    ovf = (~fracsum[12]&F1[12]&F2[12])|(fracsum[12]&(~F1[12])&(~F2[12]));
     if(ovf)begin
     fracsum <= fracsum >> 1;
     ebuf <= ebuf + 1;
     end
-    next_state = 5;
+    next_state <= 5;
     end
-    5:begin//check if fracsum normalized
-    if(sbuf == fracsum[3])begin//not normalized
-    fracsum <= fracsum << 1;
+    
+    5: begin//check if fracsum normalized
+    if(fracsum[11] != 1 && (fracsum != 0)) begin//not normalized
+    fracsum[11:0] <= fracsum[11:0] << 1;
     ebuf <= ebuf - 1;
-    next_state = 5;
-   end
-    else if(sbuf != fracsum[3])begin//normalized
-    next_state <= 0;
-    res <= {sbuf, ebuf, fracsum};
+    next_state <= 5;
+    end else begin
+    res <= {sbuf, ebuf, fracsum[10:7]};
     done <= 1;
+    next_state <= 0;
     end
     end
     
@@ -86,7 +88,7 @@ always @(posedge clk)begin
 endcase    
 end  
 
-always @(posedge clk) begin
+always @(negedge clk) begin
     state <= next_state;
     end
 endmodule
