@@ -10,8 +10,6 @@ output [7:0] apass, bpass
 reg [7:0] temp;
 reg [7:0] aprev;
 reg [7:0] bprev;
-assign apass = aprev;
-assign bpass = bprev;
 //multiply variables
 reg [4:0] mF1,mF2; 
 reg [2:0] mE1,mE2;
@@ -36,6 +34,8 @@ mF2 <= 0;
 aF1 <= 0;
 aF2 <= 0;
 end
+assign apass = aprev;
+assign bpass = bprev;
 //addtest a0(.clk(clk),.ain(out),.op2(temp),.res(out));
 //multest m0(.clk(clk),.ain(ain),.op2(bin),.res(temp));
 
@@ -109,6 +109,11 @@ end
     aE2 = temp[6:4];
     aS1 = out[7];
     aS2 = temp[7];
+    if(out == 0) begin
+    out = temp;
+    end else if(temp == 0) begin
+    out = out;
+    end else begin
     if(aE1 == aE2)begin
     aebuf = aE1;
     asbuf = aS1;
@@ -184,5 +189,7 @@ end
     out <= {asbuf, aebuf, afracsum[10:7]};
 
 end
+end
+
 
 endmodule
