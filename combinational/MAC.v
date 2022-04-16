@@ -21,9 +21,13 @@ end
 assign apass = aprev;
 assign bpass = bprev;
 
+wire [7:0] addresult, mulresult;
+addtest a0(.clk(clk),.op1(out),.op2(temp),.res(out));
+multest m0(.clk(clk),.op1(ain),.op2(bin),.res(temp));
+
 always @(posedge clk) begin
-temp = ain * bin;
-out = out + temp;
+//temp = ain * bin;taken care of by multest
+//out = out + temp;addtest
 aprev = ain;
 bprev = bin;
 end
