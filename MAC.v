@@ -17,7 +17,7 @@ reg [2:0] mebuf;
 reg [9:0] mfbuf;
 wire msbuf = 0;
 //add variables
-reg [12:0] aF1,aF2; 
+reg [13:0] aF1,aF2; 
 reg [2:0] aE1,aE2;
 reg aS1,aS2;
 reg [13:0] afracsum;
@@ -106,10 +106,10 @@ end
 //---------------adding-----------------------------//
 //op1 out
 //op2 temp
-    aF1[12:7] = {out[7],1'b1,out[3:0]};
-    aF1[13] = 0;
-    aF2[12:7] = {temp[7],1'b1,temp[3:0]};
-    aF2[13] = 0;
+    aF1[13:7] = {out[7],1'b1,out[3:0]};
+    aF1[14] = 0;
+    aF2[13:7] = {temp[7],1'b1,temp[3:0]};
+    aF2[14] = 0;
     aE1 = out[6:4];
     aE2 = temp[6:4];
     aS1 = out[7];
@@ -134,7 +134,7 @@ end
      aebuf = aE2 + (aE1 - aE2);
     end
     afracsum = aF1 + aF2;
-    aovf = (~afracsum[12]&&aF1[12]&&aF2[12])||(afracsum[12]&&(~aF1[12])&&(~aF2[12]));
+    aovf = (~afracsum[12]&&aF1[13]&&aF2[12])||(afracsum[12]&&(~aF1[12])&&(~aF2[12]));
     if(aovf)begin
     afracsum = afracsum >> 1;
     aebuf = aebuf + 1;
