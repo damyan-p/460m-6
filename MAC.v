@@ -20,7 +20,7 @@ wire msbuf = 0;
 reg [12:0] aF1,aF2; 
 reg [2:0] aE1,aE2;
 reg aS1,aS2;
-reg [13:0] afracsum;//added extra bit
+reg [13:0] afracsum;
 reg [2:0] aebuf;
 reg asbuf = 0;
 reg aovf;
@@ -36,7 +36,8 @@ aF2 <= 0;
 end
 assign apass = aprev;
 assign bpass = bprev;
-
+//addtest a0(.clk(clk),.ain(out),.op2(temp),.res(out));
+//multest m0(.clk(clk),.ain(ain),.op2(bin),.res(temp));
 
 //temp = ain * bin;taken care of by multest
 //out = out + temp;addtest
@@ -106,7 +107,9 @@ end
 //op1 out
 //op2 temp
     aF1[12:7] = {out[7],1'b1,out[3:0]};
+    aF1[13] = 0;
     aF2[12:7] = {temp[7],1'b1,temp[3:0]};
+    aF2[13] = 0;
     aE1 = out[6:4];
     aE2 = temp[6:4];
     aS1 = out[7];
@@ -130,66 +133,67 @@ end
      aF2[11:0] = aF2[11:0] >> (aE1 - aE2);
      aebuf = aE2 + (aE1 - aE2);
     end
-
-
     afracsum = aF1 + aF2;
-    aovf = (~afracsum[13]&&aF1[12]&&aF2[12])||(afracsum[13]&&(~aF1[12])&&(~aF2[12]));
+    aovf = (~afracsum[12]&&aF1[12]&&aF2[12])||(afracsum[12]&&(~aF1[12])&&(~aF2[12]));
     if(aovf)begin
     afracsum = afracsum >> 1;
     aebuf = aebuf + 1;
     end
-    
+    if(afracsum[13]) begin  //  doubling 'round', negative numbers ex. -1 + -1
+    afracsum = afracsum >> 1;
+    aebuf = aebuf + 1;
+    end
     if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
-    afracsum[11:0] <= afracsum[11:0] << 1;
-    aebuf <= aebuf - 1;
-    end //else begin
-          if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
-    afracsum[11:0] <= afracsum[11:0] << 1;
-    aebuf <= aebuf - 1;
-    end //else begin
-             if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
-    afracsum[11:0] <= afracsum[11:0] << 1;
-    aebuf <= aebuf - 1;
-    end //else begin
-           if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
-    afracsum[11:0] <= afracsum[11:0] << 1;
-    aebuf <= aebuf - 1;
-    end //else begin
-                if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
-    afracsum[11:0] <= afracsum[11:0] << 1;
-    aebuf <= aebuf - 1;
-    end //else begin
-                 if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
-    afracsum[11:0] <= afracsum[11:0] << 1;
-    aebuf <= aebuf - 1;
+    afracsum[11:0] = afracsum[11:0] << 1;
+    aebuf = aebuf - 1;
     end //else begin
         if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
-    afracsum[11:0] <= afracsum[11:0] << 1;
-    aebuf <= aebuf - 1;
+    afracsum[11:0] = afracsum[11:0] << 1;
+    aebuf = aebuf - 1;
+    end //else begin
+         if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
+    afracsum[11:0] = afracsum[11:0] << 1;
+    aebuf = aebuf - 1;
     end //else begin
            if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
-    afracsum[11:0] <= afracsum[11:0] << 1;
-    aebuf <= aebuf - 1;
-    end //else begin
-       if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
-    afracsum[11:0] <= afracsum[11:0] << 1;
-    aebuf <= aebuf - 1;
-    end //else begin
-            if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
-    afracsum[11:0] <= afracsum[11:0] << 1;
-    aebuf <= aebuf - 1;
+    afracsum[11:0] = afracsum[11:0] << 1;
+    aebuf = aebuf - 1;
     end //else begin
            if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
-    afracsum[11:0] <= afracsum[11:0] << 1;
-    aebuf <= aebuf - 1;
+    afracsum[11:0] = afracsum[11:0] << 1;
+    aebuf = aebuf - 1;
+    end //else begin
+           if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
+    afracsum[11:0] = afracsum[11:0] << 1;
+    aebuf = aebuf - 1;
+    end //else begin
+    if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
+    afracsum[11:0] = afracsum[11:0] << 1;
+    aebuf = aebuf - 1;
+    end //else begin
+      if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
+    afracsum[11:0] = afracsum[11:0] << 1;
+    aebuf = aebuf - 1;
+    end //else begin
+         if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
+    afracsum[11:0] = afracsum[11:0] << 1;
+    aebuf = aebuf - 1;
+    end //else begin
+         if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
+    afracsum[11:0] = afracsum[11:0] << 1;
+    aebuf = aebuf - 1;
     end //else begin
         if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
-    afracsum[11:0] <= afracsum[11:0] << 1;
-    aebuf <= aebuf - 1;
+    afracsum[11:0] = afracsum[11:0] << 1;
+    aebuf = aebuf - 1;
     end //else begin
-           if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
-    afracsum[11:0] <= afracsum[11:0] << 1;
-    aebuf <= aebuf - 1;
+     if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
+    afracsum[11:0] = afracsum[11:0] << 1;
+    aebuf = aebuf - 1;
+    end //else begin
+     if(afracsum[11] != 1 && (afracsum != 0)) begin//not normalized
+    afracsum[11:0] = afracsum[11:0] << 1;
+    aebuf = aebuf - 1;
     end //else begin
     out <= {asbuf, aebuf, afracsum[10:7]};
 
