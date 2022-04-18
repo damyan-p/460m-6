@@ -51,9 +51,6 @@ mE1 = ain[6:4] - 3;
 mE2 = bin[6:4] - 3;
 mebuf = mE1 + mE2 + 3;
 mfbuf = mF1 * mF2;
-if(ain == 0 || bin == 0) begin
-temp = 0;
-end else begin
   if(mfbuf == 0)begin
  temp = {(ain[7]^bin[7]),mebuf,4'b0000};
  end 
@@ -102,7 +99,7 @@ end else begin
   temp = {(ain[7]^bin[7]),mebuf,mfbuf[7:4]};
  end
 end
-end
+
 //---------------adding-----------------------------//
 //op1 out
 //op2 temp
